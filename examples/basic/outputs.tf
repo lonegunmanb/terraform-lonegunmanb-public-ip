@@ -1,3 +1,3 @@
-output "echo_text" {
-  value = module.echo.echo_text
+output "public_ip" {
+  value = module.ip.public_ip
 }

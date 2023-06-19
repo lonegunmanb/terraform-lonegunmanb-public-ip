@@ -13,8 +13,8 @@ func TestExamplesBasic(t *testing.T) {
 	test_helper.RunE2ETest(t, "../../", "examples/basic", terraform.Options{
 		Upgrade: true,
 	}, func(t *testing.T, output test_helper.TerraformOutput) {
-		gotEchoText, ok := output["echo_text"].(string)
+		publicIp, ok := output["public_ip"].(string)
 		assert.True(t, ok)
-		assert.Regexp(t, regexp.MustCompile("Hello, world!"), gotEchoText)
+		assert.Regexp(t, regexp.MustCompile(`((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}`), publicIp)
 	})
 }

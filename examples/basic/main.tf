@@ -1,6 +1,3 @@
-module "echo" {
+module "ip" {
   source = "../.."
-
-  echo_text = "Hello, world!"
 }
-

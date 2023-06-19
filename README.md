@@ -1,37 +1,38 @@
-# Microsoft Verified Terraform Module
+# Terraform Public IP module
 
-The Verified Terraform module is a template repository to help developers create their own Terraform Module.
+This Terraform module fetches the public IP address of the system running the Terraform code. It queries three different public APIs to ensure reliability and fallback support.
 
-As we've used Microsoft 1ES Runners Pool as our acceptance test runner, **only Microsoft members could use this template for now**.
+* Big Data Cloud API: (https://api.bigdatacloud.net/data/client-ip)[https://api.bigdatacloud.net/data/client-ip]
+* See IP API: (https://ipv4.seeip.org/jsonip)[https://ipv4.seeip.org/jsonip]
+* Ifconfig.me API: (https://ifconfig.me/all.json)[https://ifconfig.me/all.json]
 
-Enjoy it by following steps:
+The module will attempt to fetch the IP address from the Big Data Cloud API first. If the IP address is not available, it will try the See IP API. If both of these fail, it will fall back to the Ifconfig.me API.
 
-1. Use [this template](https://github.com/Azure/terraform-verified-module) to create your repository.
-2. Read [Onboard 1ES hosted Github Runners Pool through Azure Portal](https://eng.ms/docs/cloud-ai-platform/devdiv/one-engineering-system-1es/1es-docs/1es-github-runners/createpoolportal), install [1ES Resource Management](https://github.com/apps/1es-resource-management) on your repo.
-3. Add a Github [Environment](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment) named **acctests** in your repo, setup [**Required Reviewers**](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#required-reviewers).
-4. Update [`acc-test.yaml`](.github/workflows/acc-test.yaml), modify `runs-on: [self-hosted, 1ES.Pool=<YOUR_REPO_NAME>]` with your 1es runners' pool name (basically it's your repo's name).
-5. Write Terraform code in a new branch.
-6. Run `docker run --rm -v ${pwd}:/src -w /src mcr.microsoft.com/azterraform:latest make pre-commit` to format the code.
-7. Run `docker run --rm -v $(pwd):/src -w /src mcr.microsoft.com/azterraform:latest make pr-check` to run the check in local.
-8. Create a pull request for the main branch.
-    * CI pr-check will be executed automatically.
-    * Once pr-check was passed, with manually approval, the e2e test and version upgrade test would be executed.
-9. Merge pull request.
-10. Enjoy it!
+Example:
+
+```hcl
+module "ip" {
+  source = "../.."
+}
+
+output "public_ip" {
+  value = module.ip.public_ip
+}
+```
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
-| Name                                                                      | Version |
-|---------------------------------------------------------------------------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1  |
-| <a name="requirement_null"></a> [null](#requirement\_null)                | >= 3.1  |
+| Name                                                                      | Version  |
+|---------------------------------------------------------------------------|----------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1   |
+| <a name="requirement_curl"></a> [curl](#requirement\_curl)                | >= 1.0.2 |
 
 ## Providers
 
-| Name                                                 | Version |
-|------------------------------------------------------|---------|
-| <a name="provider_null"></a> [null](#provider\_null) | >= 3.1  |
+| Name                                                 | Version  |
+|------------------------------------------------------|----------|
+| <a name="provider_curl"></a> [curl](#provider\_curl) | >= 1.0.2 |
 
 ## Modules
 
@@ -39,19 +40,19 @@ No modules.
 
 ## Resources
 
-| Name                                                                                                       | Type     |
-|------------------------------------------------------------------------------------------------------------|----------|
-| [null_resource.nop](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| Name                                                                                                             | Type        |
+|------------------------------------------------------------------------------------------------------------------|-------------|
+| [curl_curl.big_data_cloud](https://registry.terraform.io/providers/anschoewe/curl/latest/docs/data-sources/curl) | data source |
+| [curl_curl.ifconfig_me](https://registry.terraform.io/providers/anschoewe/curl/latest/docs/data-sources/curl)    | data source |
+| [curl_curl.see_ip](https://registry.terraform.io/providers/anschoewe/curl/latest/docs/data-sources/curl)         | data source |
 
 ## Inputs
 
-| Name                                                            | Description      | Type     | Default | Required |
-|-----------------------------------------------------------------|------------------|----------|---------|:--------:|
-| <a name="input_echo_text"></a> [echo\_text](#input\_echo\_text) | The text to echo | `string` | n/a     |   yes    |
+No inputs.
 
 ## Outputs
 
-| Name                                                              | Description      |
-|-------------------------------------------------------------------|------------------|
-| <a name="output_echo_text"></a> [echo\_text](#output\_echo\_text) | The text to echo |
+| Name                                                              | Description         |
+|-------------------------------------------------------------------|---------------------|
+| <a name="output_public_ip"></a> [public\_ip](#output\_public\_ip) | Your ipv4 public ip |
 <!-- END_TF_DOCS -->
